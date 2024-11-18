@@ -201,6 +201,7 @@ import {Channel,User} from 'components/models';
 
 export default defineComponent({
   components: {ContentPage, AccountSettings},
+  name: 'MainLayout',
   setup() {
     const leftDrawer = ref(false);
     const rightDrawer = ref(false);

@@ -105,6 +105,7 @@
                   class="full-width"
                   style="border-radius: 10px;"
                   @click="onSubmit"
+                  :loading="loading"
                 />
               </div>
             </q-card-section>
@@ -124,7 +125,8 @@
 </template>
 <script lang="ts">
 import {RouteLocationRaw} from 'vue-router'
-export default {
+
+export default{
   name: 'RegisterPage',
   data () {
     return {
@@ -139,7 +141,10 @@ export default {
   },
   computed: {
     redirectTo (): RouteLocationRaw {
-      return { name: '/login' }
+      return { name: 'login' }
+    },
+    loading (): boolean {
+      return this.$store.state.auth.status === 'pending'
     }
   },
   methods: {

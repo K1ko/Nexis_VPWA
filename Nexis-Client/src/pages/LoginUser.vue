@@ -1,52 +1,49 @@
-<script setup>
-import {ref} from 'vue';
-import {useQuasar} from 'quasar';
-import {useRouter} from 'vue-router';
+<script lang="ts">
+import { defineComponent } from 'vue'
+import { RouteLocationRaw } from 'vue-router'
 
-const $q = useQuasar();
-const router = useRouter();
-
-const email = ref(null);
-const password = ref(null);
-
-const onSubmit = () => {
-  if (email.value === null || password.value === null) {
-    $q.notify({
-      color: 'red-5',
-      textColor: 'white',
-      icon: 'warning',
-      message: 'Email and password are required',
-      position: 'top'
-    });
-  } else {
-    $q.notify({
-      color: 'green-4',
-      textColor: 'white',
-      icon: 'cloud_done',
-      message: 'Logged in',
-      position: 'top'
-    });
-    router.push({name: 'home'});
+export default defineComponent({
+  name: 'LoginPage',
+  data () {
+    return {
+      credentials: { email: '', password: ''},
+    }
+  },
+  computed: {
+    redirectTo (): RouteLocationRaw {
+      return { name: 'home' }
+    },
+    loading (): boolean {
+      return this.$store.state.auth.status === 'pending'
+    }
+  },
+  methods: {
+    onSubmit () {
+      this.$store.dispatch('/login', this.credentials).then(() => this.$router.push(this.redirectTo))
+    }
   }
-}
-
+})
 </script>
+
 
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-page-container>
       <q-page class="flex flex-center blue-gradient">
         <q-card class="my_card">
-          <q-form @submit="onSubmit" class="q-gutter-md">
+          <q-form ref="form" class="q-gutter-md">
             <q-card-section class="text-center">
               <div class="text-accent  text-h6">Sign In</div>
               <div class="text-grey-8">Sign in below to access your account</div>
             </q-card-section>
             <q-card-section class="q-pb-none q-pt-none">
               <q-input
+                name="email"
+                id="email"
                 dense
                 outlined
-                v-model="email"
+                v-model.trim="credentials.email"
+                type="email"
                 class="q-mt-md"
                 label="Email"
                 hint="Your email"
@@ -58,9 +55,11 @@ const onSubmit = () => {
                 </template>
               </q-input>
               <q-input
+                id="password"
+                name="password"
                 dense
                 outlined
-                v-model="password"
+                v-model="credentials.password"
                 class="q-mt-md"
                 label="Password"
                 hint="Your password"
@@ -74,17 +73,17 @@ const onSubmit = () => {
             </q-card-section>
             <q-card-section class="q-pt-none">
               <q-btn
-                type="submit"
                 class="full-width q-mt-md"
                 color="accent"
                 label="Sign In"
+                :loading="loading"
+                @click="onSubmit"
                 style="border-radius: 10px;"
               />
             </q-card-section>
             <q-card-section class="text-center q-pt-none">
               <div class="text-grey-8">Don't have an account?
-                <router-link to="/register" class="text-dark text-weight-bold" style="text-decoration:none">Sign up
-                </router-link>
+                <q-btn label="Create account" size="sm" flat :to="{ name: 'register' }"></q-btn>
               </div>
             </q-card-section>
           </q-form>
